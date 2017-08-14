@@ -25,68 +25,68 @@ DEALINGS IN THE SOFTWARE.
 
 namespace CookComputing.XmlRpc
 {
-  using System;
+    using System;
 
-  public class XmlRpcDateTime 
-  {
-    private DateTime _value;
-
-    public XmlRpcDateTime()
+    public class XmlRpcDateTime
     {
-      this._value = new DateTime();
-    }
+        private DateTime _value;
 
-    public XmlRpcDateTime(DateTime val) 
-    {
-      this._value = val;
-    }
+        public XmlRpcDateTime()
+        {
+            this._value = new DateTime();
+        }
 
-    public override string ToString() 
-    {
-      return _value.ToString();
-    }
+        public XmlRpcDateTime(DateTime val)
+        {
+            this._value = val;
+        }
 
-    public override int GetHashCode()
-    {
-      return _value.GetHashCode();
-    }
+        public override string ToString()
+        {
+            return _value.ToString();
+        }
 
-    public override bool Equals(
-      object o)
-    {
-      if (o == null || !(o is XmlRpcDateTime))
-        return false;
-      XmlRpcDateTime dbl = o as XmlRpcDateTime;
-      return (dbl._value == _value);
-    }
+        public override int GetHashCode()
+        {
+            return _value.GetHashCode();
+        }
 
-    public static bool operator ==(
-      XmlRpcDateTime xi, 
-      XmlRpcDateTime xj)
-    {
-      if (((object)xi) == null && ((object)xj) == null) 
-        return true;
-      else if (((object)xi) == null || ((object)xj) == null)
-        return false;
-      else
-        return xi._value == xj._value;
-    }
+        public override bool Equals(
+          object o)
+        {
+            if (o == null || !(o is XmlRpcDateTime))
+                return false;
+            XmlRpcDateTime dbl = o as XmlRpcDateTime;
+            return (dbl._value == _value);
+        }
 
-    public static bool operator != (
-      XmlRpcDateTime xi, 
-      XmlRpcDateTime xj)
-    {
-      return !(xi == xj);
-    }
+        public static bool operator ==(
+          XmlRpcDateTime xi,
+          XmlRpcDateTime xj)
+        {
+            if (((object)xi) == null && ((object)xj) == null)
+                return true;
+            else if (((object)xi) == null || ((object)xj) == null)
+                return false;
+            else
+                return xi._value == xj._value;
+        }
 
-    public static implicit operator DateTime (XmlRpcDateTime x)
-    {
-      return x._value;
-    }
+        public static bool operator !=(
+          XmlRpcDateTime xi,
+          XmlRpcDateTime xj)
+        {
+            return !(xi == xj);
+        }
 
-    public static implicit operator XmlRpcDateTime(DateTime x) 
-    {
-      return new XmlRpcDateTime(x);
+        public static implicit operator DateTime(XmlRpcDateTime x)
+        {
+            return x._value;
+        }
+
+        public static implicit operator XmlRpcDateTime(DateTime x)
+        {
+            return new XmlRpcDateTime(x);
+        }
     }
-  }
 }

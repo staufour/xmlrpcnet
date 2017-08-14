@@ -26,56 +26,61 @@ DEALINGS IN THE SOFTWARE.
 using System;
 using System.Collections;
 using System.Runtime.Remoting.Channels;
-
+using System.Security;
 using CookComputing.XmlRpc;
 
 namespace CookComputing.XmlRpc
 {
-  public class XmlRpcServerFormatterSinkProvider : IServerFormatterSinkProvider
-  {
-    // constructors
-    public XmlRpcServerFormatterSinkProvider(
-      IDictionary properties, 
-      ICollection providerData) 
+    public class XmlRpcServerFormatterSinkProvider : IServerFormatterSinkProvider
     {
-      // can use properties to pass in custom attributes from the config
-      // file which can then be passed to sink constructor as required
-    }
+        // constructors
+        public XmlRpcServerFormatterSinkProvider(
+          IDictionary properties,
+          ICollection providerData)
+        {
+            // can use properties to pass in custom attributes from the config
+            // file which can then be passed to sink constructor as required
+        }
 
-    public XmlRpcServerFormatterSinkProvider()
-    {
-      // can use properties to pass in custom attributes from the config
-      // file which can then be passed to sink constructor as required
-    }
+        public XmlRpcServerFormatterSinkProvider()
+        {
+            // can use properties to pass in custom attributes from the config
+            // file which can then be passed to sink constructor as required
+        }
 
-    // properties
-    //
-    public IServerChannelSinkProvider Next
-    {
-      get { return m_next; }
-      set { m_next = value; }
-    }
+        // properties
+        //
+        public IServerChannelSinkProvider Next
+        {
+            [SecurityCritical]
+            get { return m_next; }
 
-    // public methods
-    //
-    public IServerChannelSink CreateSink(
-      IChannelReceiver channel)
-    {
-      IServerChannelSink scs = null;
-      if (m_next != null)
-      {
-        scs = m_next.CreateSink(channel);
-      }
-      return new XmlRpcServerFormatterSink(scs);
-    }
+            [SecurityCritical]
+            set { m_next = value; }
+        }
 
-    public void GetChannelData(IChannelDataStore channelData)
-    {
-      // TODO: not required???
-    }
+        // public methods
+        //
+        [SecurityCritical]
+        public IServerChannelSink CreateSink(
+          IChannelReceiver channel)
+        {
+            IServerChannelSink scs = null;
+            if (m_next != null)
+            {
+                scs = m_next.CreateSink(channel);
+            }
+            return new XmlRpcServerFormatterSink(scs);
+        }
 
-    // data
-    //
-    IServerChannelSinkProvider m_next;
-  }
+        [SecurityCritical]
+        public void GetChannelData(IChannelDataStore channelData)
+        {
+            // TODO: not required???
+        }
+
+        // data
+        //
+        IServerChannelSinkProvider m_next;
+    }
 }

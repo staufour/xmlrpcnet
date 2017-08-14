@@ -1,142 +1,141 @@
 using System;
-using System.Diagnostics;
 using System.IO;
+using System.Reflection;
 using System.Text;
 using System.Xml;
 using CookComputing.XmlRpc;
 
 namespace ntest
 {
+    public class Utils
+    {
+        public static XmlDocument Serialize(
+          string testName,
+          object obj,
+          Encoding encoding,
+          MappingAction action)
+        {
+            Stream stm = new MemoryStream();
+            XmlTextWriter xtw = new XmlTextWriter(stm, Encoding.UTF8);
+            xtw.Formatting = Formatting.Indented;
+            xtw.Indentation = 2;
+            xtw.WriteStartDocument();
+            XmlRpcSerializer ser = new XmlRpcSerializer();
+            ser.Serialize(xtw, obj, action);
+            xtw.Flush();
+            //Console.WriteLine(testName);
+            stm.Position = 0;
+            TextReader trdr = new StreamReader(stm, new UTF8Encoding(), true, 4096);
+            String s = trdr.ReadLine();
+            while (s != null)
+            {
+                //Console.WriteLine(s);
+                s = trdr.ReadLine();
+            }
+            stm.Position = 0;
+            XmlDocument xdoc = new XmlDocument();
+            xdoc.PreserveWhitespace = true;
+            xdoc.Load(stm);
+            return xdoc;
+        }
 
-  public class Utils
-  {
-    public static XmlDocument Serialize(
-      string testName,
-      object obj, 
-      Encoding encoding,
-      MappingAction action)
-    {
-      Stream stm = new MemoryStream();
-      XmlTextWriter xtw = new XmlTextWriter(stm, Encoding.UTF8);
-      xtw.Formatting = Formatting.Indented;
-      xtw.Indentation = 2;
-      xtw.WriteStartDocument();      
-      XmlRpcSerializer ser = new XmlRpcSerializer();
-      ser.Serialize(xtw, obj, action); 
-      xtw.Flush();
-      //Console.WriteLine(testName);
-      stm.Position = 0;    
-      TextReader trdr = new StreamReader(stm, new UTF8Encoding(), true, 4096);
-      String s = trdr.ReadLine();
-      while (s != null)
-      {
-        //Console.WriteLine(s);
-        s = trdr.ReadLine();
-      }            
-      stm.Position = 0;    
-      XmlDocument xdoc = new XmlDocument();
-      xdoc.PreserveWhitespace = true;
-      xdoc.Load(stm);
-      return xdoc;
-    }
-    	
-    public static string SerializeToString(
-      string testName,
-      object obj, 
-      MappingAction action)
-    {
-      StringWriter strwrtr = new StringWriter();
-      XmlTextWriter xtw = new XmlTextWriter(strwrtr);
-      //      xtw.Formatting = formatting;
-      //      xtw.Indentation = indentation;
-      xtw.WriteStartDocument();      
-      XmlRpcSerializer ser = new XmlRpcSerializer();
-      ser.Serialize(xtw, obj, action); 
-      xtw.Flush();
-      //Console.WriteLine(testName);
-      //Console.WriteLine(strwrtr.ToString());
-      return strwrtr.ToString();
-    }
+        public static string SerializeToString(
+          string testName,
+          object obj,
+          MappingAction action)
+        {
+            StringWriter strwrtr = new StringWriter();
+            XmlTextWriter xtw = new XmlTextWriter(strwrtr);
+            //      xtw.Formatting = formatting;
+            //      xtw.Indentation = indentation;
+            xtw.WriteStartDocument();
+            XmlRpcSerializer ser = new XmlRpcSerializer();
+            ser.Serialize(xtw, obj, action);
+            xtw.Flush();
+            //Console.WriteLine(testName);
+            //Console.WriteLine(strwrtr.ToString());
+            return strwrtr.ToString();
+        }
 
-    //----------------------------------------------------------------------// 
-    public static object Parse(
-      string xml, 
-      Type valueType, 
-      MappingAction action,
-      out Type parsedType,
-      out Type parsedArrayType)
-    {
-      StringReader sr = new StringReader(xml);
-      XmlDocument xdoc = new XmlDocument();
-      xdoc.PreserveWhitespace = true;
-      xdoc.Load(sr);        
-      return Parse(xdoc, valueType, action, 
-        out parsedType, out parsedArrayType);
-    }
-    
-    public static object Parse(
-      XmlDocument xdoc, 
-      Type valueType, 
-      MappingAction action,
-      out Type parsedType,
-      out Type parsedArrayType)
-    {
-      XmlNode node = SelectValueNode(xdoc.SelectSingleNode("value"));               
-      XmlRpcSerializer.ParseStack parseStack 
-        = new XmlRpcSerializer.ParseStack("request");
-      XmlRpcSerializer ser = new XmlRpcSerializer();
-      object obj = ser.ParseValue(node, valueType, parseStack, action,
-        out parsedType, out parsedArrayType);
-      return obj;
-    }
+        //----------------------------------------------------------------------// 
+        public static object Parse(
+          string xml,
+          Type valueType,
+          MappingAction action,
+          out Type parsedType,
+          out Type parsedArrayType)
+        {
+            StringReader sr = new StringReader(xml);
+            XmlDocument xdoc = new XmlDocument();
+            xdoc.PreserveWhitespace = true;
+            xdoc.Load(sr);
+            return Parse(xdoc, valueType, action,
+              out parsedType, out parsedArrayType);
+        }
 
-    public static object Parse(
-      string xml,
-      Type valueType,
-      MappingAction action,
-      XmlRpcSerializer serializer,
-      out Type parsedType,
-      out Type parsedArrayType)
-    {
-      StringReader sr = new StringReader(xml);
-      XmlDocument xdoc = new XmlDocument();
-      xdoc.PreserveWhitespace = true;
-      xdoc.Load(sr);
-      return Parse(xdoc, valueType, action, serializer,
-        out parsedType, out parsedArrayType);
-    }
+        public static object Parse(
+          XmlDocument xdoc,
+          Type valueType,
+          MappingAction action,
+          out Type parsedType,
+          out Type parsedArrayType)
+        {
+            XmlNode node = SelectValueNode(xdoc.SelectSingleNode("value"));
+            XmlRpcSerializer.ParseStack parseStack
+              = new XmlRpcSerializer.ParseStack("request");
+            XmlRpcSerializer ser = new XmlRpcSerializer();
+            object obj = ser.ParseValue(node, valueType, parseStack, action,
+              out parsedType, out parsedArrayType);
+            return obj;
+        }
 
-    public static object Parse(
-      XmlDocument xdoc,
-      Type valueType,
-      MappingAction action,
-      XmlRpcSerializer serializer,
-      out Type parsedType,
-      out Type parsedArrayType)
-    {
-      XmlNode node = SelectValueNode(xdoc.SelectSingleNode("value"));
-      XmlRpcSerializer.ParseStack parseStack
-        = new XmlRpcSerializer.ParseStack("request");
-      object obj = serializer.ParseValue(node, valueType, parseStack, action,
-        out parsedType, out parsedArrayType);
-      return obj;
-    }
+        public static object Parse(
+          string xml,
+          Type valueType,
+          MappingAction action,
+          XmlRpcSerializer serializer,
+          out Type parsedType,
+          out Type parsedArrayType)
+        {
+            StringReader sr = new StringReader(xml);
+            XmlDocument xdoc = new XmlDocument();
+            xdoc.PreserveWhitespace = true;
+            xdoc.Load(sr);
+            return Parse(xdoc, valueType, action, serializer,
+              out parsedType, out parsedArrayType);
+        }
 
-    static XmlNode SelectValueNode(XmlNode valueNode)
-    {
-      // an XML-RPC value is either held as the child node of a <value> element
-      // or is just the text of the value node as an implicit string value
-      XmlNode vvNode = valueNode.SelectSingleNode("*");
-      if (vvNode == null)
-        vvNode = valueNode.FirstChild;
-      return vvNode;
-    }
+        public static object Parse(
+          XmlDocument xdoc,
+          Type valueType,
+          MappingAction action,
+          XmlRpcSerializer serializer,
+          out Type parsedType,
+          out Type parsedArrayType)
+        {
+            XmlNode node = SelectValueNode(xdoc.SelectSingleNode("value"));
+            XmlRpcSerializer.ParseStack parseStack
+              = new XmlRpcSerializer.ParseStack("request");
+            object obj = serializer.ParseValue(node, valueType, parseStack, action,
+              out parsedType, out parsedArrayType);
+            return obj;
+        }
 
-    public static string[] GetLocales()
-    {
-      return new string[] 
-      {
-        "af-ZA", 
+        static XmlNode SelectValueNode(XmlNode valueNode)
+        {
+            // an XML-RPC value is either held as the child node of a <value> element
+            // or is just the text of the value node as an implicit string value
+            XmlNode vvNode = valueNode.SelectSingleNode("*");
+            if (vvNode == null)
+                vvNode = valueNode.FirstChild;
+            return vvNode;
+        }
+
+        public static string[] GetLocales()
+        {
+            return new string[]
+            {
+        "af-ZA",
         "sq-AL",
         "ar-DZ",
         "ar-BH",
@@ -269,7 +268,18 @@ namespace ntest
         "uz-Cyrl-UZ",
         "uz-Latn-UZ",
         "vi-VN"
-      };
+            };
+        }
+
+        public static string AssemblyDirectory
+        {
+            get
+            {
+                string codeBase = Assembly.GetExecutingAssembly().CodeBase;
+                UriBuilder uri = new UriBuilder(codeBase);
+                string path = Uri.UnescapeDataString(uri.Path);
+                return Path.GetDirectoryName(path);
+            }
+        }
     }
-  }
 }
